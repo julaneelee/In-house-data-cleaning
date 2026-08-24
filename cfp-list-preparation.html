@@ -422,6 +422,14 @@
       <div class="domain-grid" id="bigDomainGrid" style="margin-top:8px;"></div>
       <strong style="font-size:13px; display:block; margin-top:16px;">Generic / regional suffixes</strong>
       <div class="domain-grid" id="genericDomainGrid" style="margin-top:8px;"></div>
+      <hr style="border:none;border-top:1px solid var(--line); margin:16px 0;">
+      <strong style="font-size:13px;">Custom domain endings (optional)</strong>
+      <p style="font-size:12.5px; color:var(--ink-soft); margin:4px 0 10px;">For domains that don't fit any category above, e.g. regional domains like <code>.cat</code> for Catalan institutions. Type without the leading dot.</p>
+      <div class="chip-input-row">
+        <input type="text" id="customDomainInput" placeholder="e.g. cat &ndash; press Enter to add">
+        <button class="secondary" id="customDomainAddBtn">Add</button>
+      </div>
+      <div class="chips" id="customDomainChips"><span class="chips-empty">No custom domain endings added.</span></div>
     </div>
   </section>
 
@@ -519,7 +527,7 @@
    DATA: zones, aliases, domains, default exclude keywords
    ============================================================ */
 
-const ZONE1 = ["Australia","Austria","Belgium","Bulgaria","Canada","China","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Germany","Greece","Hong Kong","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia","Liechtenstein","Lithuania","Luxembourg","Macao","Malta","Netherlands","New Zealand","Norway","Poland","Portugal","Singapore","Slovakia","Slovenia","South Korea","Spain","Sweden","Switzerland","Taiwan","United Kingdom","United States"];
+const ZONE1 = ["Australia","Austria","Belgium","Bulgaria","Canada","China","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Germany","Greece","Hong Kong","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia","Liechtenstein","Lithuania","Luxembourg","Macao","Malta","Netherlands","New Zealand","Norway","Poland","Portugal","Romania","Singapore","Slovakia","Slovenia","South Korea","Spain","Sweden","Switzerland","Taiwan","United Kingdom","United States"];
 
 const ZONE2 = ["Algeria","Argentina","Bahrain","Belarus","Bosnia and Herzegovina","Brazil","Chile","Colombia","Costa Rica","Cuba","Ecuador","Egypt","French Guiana","Georgia","Guyana","Malaysia","Mexico","Morocco","North Macedonia","Northern Mariana Islands","Oman","Peru","Qatar","Saudi Arabia","Serbia","South Africa","Thailand","Turkey","Ukraine","United Arab Emirates","Uruguay","Vietnam"];
 
@@ -527,7 +535,7 @@ const ZONE3 = ["Afghanistan","Andorra","Angola","Antigua and Barbuda","Armenia",
 
 // country name (lowercase) -> ccTLD (used to trust an email domain for that country)
 const COUNTRY_TLD = {
-  "australia":"au","austria":"at","belgium":"be","bulgaria":"bg","canada":"ca","china":"cn","croatia":"hr","cyprus":"cy","czech republic":"cz","denmark":"dk","estonia":"ee","finland":"fi","france":"fr","germany":"de","greece":"gr","hong kong":"hk","hungary":"hu","iceland":"is","ireland":"ie","israel":"il","italy":"it","japan":"jp","latvia":"lv","liechtenstein":"li","lithuania":"lt","luxembourg":"lu","macao":"mo","malta":"mt","netherlands":"nl","new zealand":"nz","norway":"no","poland":"pl","portugal":"pt","singapore":"sg","slovakia":"sk","slovenia":"si","south korea":"kr","spain":"es","sweden":"se","switzerland":"ch","taiwan":"tw","united kingdom":"uk","united states":"us",
+  "australia":"au","austria":"at","belgium":"be","bulgaria":"bg","canada":"ca","china":"cn","croatia":"hr","cyprus":"cy","czech republic":"cz","denmark":"dk","estonia":"ee","finland":"fi","france":"fr","germany":"de","greece":"gr","hong kong":"hk","hungary":"hu","iceland":"is","ireland":"ie","israel":"il","italy":"it","japan":"jp","latvia":"lv","liechtenstein":"li","lithuania":"lt","luxembourg":"lu","macao":"mo","malta":"mt","netherlands":"nl","new zealand":"nz","norway":"no","poland":"pl","portugal":"pt","romania":"ro","singapore":"sg","slovakia":"sk","slovenia":"si","south korea":"kr","spain":"es","sweden":"se","switzerland":"ch","taiwan":"tw","united kingdom":"uk","united states":"us",
   "algeria":"dz","argentina":"ar","bahrain":"bh","belarus":"by","bosnia and herzegovina":"ba","brazil":"br","chile":"cl","colombia":"co","costa rica":"cr","cuba":"cu","ecuador":"ec","egypt":"eg","french guiana":"gf","georgia":"ge","guyana":"gy","malaysia":"my","mexico":"mx","morocco":"ma","north macedonia":"mk","northern mariana islands":"mp","oman":"om","peru":"pe","qatar":"qa","saudi arabia":"sa","serbia":"rs","south africa":"za","thailand":"th","turkey":"tr","ukraine":"ua","united arab emirates":"ae","uruguay":"uy","vietnam":"vn",
   "afghanistan":"af","andorra":"ad","angola":"ao","antigua and barbuda":"ag","armenia":"am","aruba":"aw","azerbaijan":"az","bahamas":"bs","bangladesh":"bd","barbados":"bb","belize":"bz","benin":"bj","bhutan":"bt","bolivia":"bo","botswana":"bw","brunei darussalam":"bn","burkina faso":"bf","burundi":"bi","cabo verde":"cv","cambodia":"kh","cameroon":"cm","central african republic":"cf","chad":"td","comoros":"km","congo":"cg","côte d’ivoire":"ci","democratic republic congo":"cd","djibouti":"dj","dominica":"dm","dominican republic":"do","el salvador":"sv","equatorial guinea":"gq","eritrea":"er","eswatini":"sz","ethiopia":"et","faroe islands":"fo","fiji":"fj","french polynesia":"pf","gabon":"ga","gambia":"gm","ghana":"gh","greenland":"gl","grenada":"gd","guatemala":"gt","guinea":"gn","guinea-bissau":"gw","haïti":"ht","honduras":"hn","india":"in","indonesia":"id","iran":"ir","iraq":"iq","jamaica":"jm","jordan":"jo","kazakhstan":"kz","kenya":"ke","kiribati":"ki","kosovo":"xk","kuwait":"kw","kyrgyz republic":"kg","laos":"la","lebanon":"lb","lesotho":"ls","liberia":"lr","libya":"ly","madagascar":"mg","malawi":"mw","maldives":"mv","mali":"ml","marshall islands":"mh","mauritania":"mr","mauritius":"mu","micronesia":"fm","moldova":"md","mongolia":"mn","montenegro":"me","mozambique":"mz","myanmar":"mm","namibia":"na","nauru":"nr","nepal":"np","nicaragua":"ni","niger":"ne","nigeria":"ng","pakistan":"pk","palau":"pw","palestine":"ps","panama":"pa","papua new guinea":"pg","paraguay":"py","philippines":"ph","puerto rico":"pr","republic of south sudan":"ss","russian federation":"ru","rwanda":"rw","samoa":"ws","san marino":"sm","sao tome and principe":"st","senegal":"sn","seychelles":"sc","sierra leone":"sl","solomon islands":"sb","somalia":"so","south sudan":"ss","sri lanka":"lk","st. kitts and nevis":"kn","st. lucia":"lc","st. vincent and the grenadines":"vc","sudan":"sd","suriname":"sr","syrian arab republic":"sy","tajikistan":"tj","tanzania":"tz","timor-leste":"tl","togo":"tg","tonga":"to","trinidad and tobago":"tt","tunisia":"tn","turkmenistan":"tm","tuvalu":"tv","uganda":"ug","uzbekistan":"uz","vanuatu":"vu","venezuela":"ve","west bank and gaza":"ps","yemen":"ye","zambia":"zm","zimbabwe":"zw"
 };
@@ -549,7 +557,7 @@ const COUNTRY_ALIASES = {
 };
 
 const BIG_DOMAINS = ["gmail.com","outlook.com","yahoo.com","icloud.com","hotmail.com","naver.com","windowslive.com","hanmail.com","googlemail.com","samsung.com","live.com","aol.com","msn.com","mail.com","me.com","mac.com"];
-const GENERIC_DOMAINS = ["edu","org","net","eu"];
+const GENERIC_DOMAINS = ["ac","edu","org","net","eu"];
 
 const DEFAULT_EXCLUDE_KEYWORDS = ["inc","ltd","animal","veterinary","agricult","forensic","chemistry","mechanical","electrical","food","foods","natural"];
 
@@ -566,7 +574,8 @@ const state = {
   bothRows:null,
   excludeKeywords:[...DEFAULT_EXCLUDE_KEYWORDS],
   affKeywords:[],
-  refKeywords:[]
+  refKeywords:[],
+  customDomains:[]
 };
 
 /* ============================================================
@@ -794,6 +803,7 @@ function chipUI(inputId, addBtnId, chipsId, arrRef, onChange, placeholderEmpty){
 chipUI('excludeInput','excludeAddBtn','excludeChips', state.excludeKeywords, resetDownstream, 'No exclude words — nothing will be removed at this step.');
 chipUI('affInput','affAddBtn','affChips', state.affKeywords, resetDownstream, 'No affiliation keywords added — this filter will be skipped.');
 chipUI('refInput','refAddBtn','refChips', state.refKeywords, resetDownstream, 'No reference keywords added — this filter will be skipped.');
+chipUI('customDomainInput','customDomainAddBtn','customDomainChips', state.customDomains, resetDownstream, 'No custom domain endings added.');
 
 /* ============================================================
    STEP 4 — DOMAIN CHECKBOXES
@@ -836,7 +846,8 @@ function allowedBigDomains(){
   return BIG_DOMAINS.filter(d=>bigDomainChecks[d] && bigDomainChecks[d].checked);
 }
 function allowedGenericSuffixes(){
-  return GENERIC_DOMAINS.filter(d=>genericDomainChecks[d] && genericDomainChecks[d].checked);
+  const base = GENERIC_DOMAINS.filter(d=>genericDomainChecks[d] && genericDomainChecks[d].checked);
+  return base.concat(state.customDomains.map(d=>d.replace(/^\./,'').toLowerCase()));
 }
 
 function emailDomainAllowed(email, tldSet, bigList, genericList){
@@ -848,6 +859,16 @@ function emailDomainAllowed(email, tldSet, bigList, genericList){
   return false;
 }
 
+function escapeRegex(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function matchesWholeWord(text, keywords){
+  // mirrors the original Python \b...\b behaviour: matches the keyword as a
+  // whole word/token so "inc" won't match inside "Cincinnati".
+  const t = String(text||'');
+  return keywords.some(k=>{
+    const re = new RegExp('\\b'+escapeRegex(k)+'\\b','i');
+    return re.test(t);
+  });
+}
 function matchesKeywords(text, keywords){
   if(!keywords.length) return true;
   const t = String(text||'').toLowerCase();
@@ -881,8 +902,7 @@ function runFiltering(){
   // Step 3: affiliation exclude
   let step3 = step2.filter(r=>{
     if(!state.excludeKeywords.length) return true;
-    const aff = String(r.Affiliation||'').toLowerCase();
-    return !state.excludeKeywords.some(k=>aff.includes(k.toLowerCase()));
+    return !matchesWholeWord(r.Affiliation, state.excludeKeywords);
   });
 
   // Step 4: email domain + student exclusion
