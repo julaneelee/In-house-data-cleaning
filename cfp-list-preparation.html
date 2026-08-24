@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CFP List Preparation From Scilit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --paper:#F6F3EA;
+    --paper-raised:#FFFFFF;
+    --ink:#1E2A28;
+    --ink-soft:#4B5A57;
+    --line:#DAD3C2;
+    --accent:#3E6259;
+    --accent-dark:#2A4640;
+    --zone1:#4C7A6B;
+    --zone1-bg:#E4EEE9;
+    --zone2:#B07C2E;
+    --zone2-bg:#F3E8D4;
+    --zone3:#8B4A4A;
+    --zone3-bg:#F1E1DF;
+    --danger:#A3392F;
+    --font-display:'Source Serif 4', Georgia, serif;
+    --font-body:'Inter', -apple-system, sans-serif;
+    --font-mono:'JetBrains Mono', 'SFMono-Regular', Menlo, monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  a{color:var(--accent-dark);}
+
+  /* ---------- Header ---------- */
+  header.site{
+    padding:48px 24px 28px;
+    max-width:960px;
+    margin:0 auto;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:10px;
+  }
+  h1.title{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(28px,4vw,42px);
+    margin:0 0 8px;
+    letter-spacing:-0.01em;
+  }
+  p.subtitle{
+    color:var(--ink-soft);
+    font-size:15px;
+    max-width:640px;
+    margin:0;
+  }
+
+  /* ---------- Ledger (signature element) ---------- */
+  .ledger{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:var(--ink);
+    color:#EFEAE0;
+    font-family:var(--font-mono);
+    font-size:12px;
+    padding:10px 24px;
+    display:flex;
+    gap:0;
+    overflow-x:auto;
+    white-space:nowrap;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+  }
+  .ledger-inner{
+    max-width:960px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    gap:0;
+    width:100%;
+  }
+  .ledger-item{
+    display:flex;
+    flex-direction:column;
+    padding:0 18px;
+    border-right:1px dashed rgba(239,234,224,.25);
+  }
+  .ledger-item:last-child{border-right:none;}
+  .ledger-label{opacity:.55; font-size:10px; text-transform:uppercase; letter-spacing:.08em;}
+  .ledger-count{font-size:15px; font-weight:700; color:#F3D9A4;}
+
+  /* ---------- Main layout ---------- */
+  main{
+    max-width:960px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  section.step{
+    padding:40px 0;
+    border-bottom:1px solid var(--line);
+  }
+  section.step:last-of-type{border-bottom:none;}
+  .step-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin-bottom:6px;
+  }
+  .step-num{
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--paper);
+    background:var(--accent);
+    border-radius:3px;
+    padding:2px 8px;
+    font-weight:700;
+  }
+  .step-num.optional{background:var(--zone2);}
+  h2.step-title{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:22px;
+    margin:0;
+  }
+  p.step-desc{
+    color:var(--ink-soft);
+    font-size:14px;
+    margin:6px 0 20px;
+    max-width:680px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:20px 22px;
+  }
+  .card + .card{margin-top:14px;}
+
+  /* ---------- Buttons / inputs ---------- */
+  button{
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:13.5px;
+    border-radius:6px;
+    border:1px solid var(--accent);
+    background:var(--accent);
+    color:#fff;
+    padding:10px 18px;
+    cursor:pointer;
+    transition:background .15s ease, transform .1s ease;
+  }
+  button:hover{background:var(--accent-dark);}
+  button:active{transform:translateY(1px);}
+  button.secondary{
+    background:transparent;
+    color:var(--accent-dark);
+  }
+  button.secondary:hover{background:var(--zone1-bg);}
+  button:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+  }
+  button.small{padding:5px 11px; font-size:12px; border-radius:5px;}
+  input[type=text], input[type=file]{
+    font-family:var(--font-body);
+    font-size:14px;
+    padding:9px 11px;
+    border-radius:6px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    width:100%;
+  }
+  input[type=text]:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  label.check{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:13.5px;
+    padding:4px 0;
+    cursor:pointer;
+  }
+  input[type=checkbox]{width:15px; height:15px; accent-color:var(--accent);}
+
+  /* ---------- Upload ---------- */
+  .dropzone{
+    border:2px dashed var(--line);
+    border-radius:8px;
+    padding:36px 20px;
+    text-align:center;
+    background:var(--paper-raised);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .dropzone:hover, .dropzone.drag{
+    border-color:var(--accent);
+    background:var(--zone1-bg);
+  }
+  .dropzone p{margin:6px 0; color:var(--ink-soft); font-size:13.5px;}
+  .dropzone .icon{font-family:var(--font-mono); font-size:26px; color:var(--accent);}
+  .file-status{
+    margin-top:14px;
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--accent-dark);
+  }
+  .col-preview{
+    margin-top:16px;
+    font-size:13px;
+  }
+  .col-preview table{border-collapse:collapse; width:100%; font-size:12.5px;}
+  .col-preview th, .col-preview td{
+    border:1px solid var(--line);
+    padding:5px 8px;
+    text-align:left;
+    max-width:220px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .col-preview th{background:var(--zone1-bg); font-family:var(--font-mono); font-weight:700;}
+
+  /* ---------- Zones ---------- */
+  .zone-block{margin-bottom:18px;}
+  .zone-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 12px;
+    border-radius:6px;
+    margin-bottom:10px;
+  }
+  .zone-header.z1{background:var(--zone1-bg);}
+  .zone-header.z2{background:var(--zone2-bg);}
+  .zone-header.z3{background:var(--zone3-bg);}
+  .zone-name{font-family:var(--font-mono); font-weight:700; font-size:13px;}
+  .zone-header.z1 .zone-name{color:var(--zone1);}
+  .zone-header.z2 .zone-name{color:var(--zone2);}
+  .zone-header.z3 .zone-name{color:var(--zone3);}
+  .zone-actions button{padding:4px 10px; font-size:11.5px;}
+  .country-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(160px,1fr));
+    gap:2px 14px;
+  }
+
+  /* ---------- Chips ---------- */
+  .chip-input-row{display:flex; gap:8px; margin-bottom:12px;}
+  .chip-input-row input{flex:1;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:var(--zone1-bg);
+    color:var(--accent-dark);
+    border-radius:20px;
+    padding:5px 6px 5px 12px;
+    font-size:13px;
+    font-family:var(--font-mono);
+  }
+  .chip button{
+    background:none;
+    border:none;
+    color:var(--accent-dark);
+    font-weight:700;
+    font-size:13px;
+    padding:2px 7px;
+    border-radius:50%;
+    line-height:1;
+  }
+  .chip button:hover{background:rgba(0,0,0,.08);}
+  .chips-empty{color:var(--ink-soft); font-size:13px; font-style:italic;}
+
+  /* ---------- Domain checkboxes ---------- */
+  .domain-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(150px,1fr));
+    gap:2px 14px;
+  }
+
+  /* ---------- Preview / results ---------- */
+  .results-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:14px;
+    margin-top:8px;
+  }
+  @media (max-width:760px){ .results-grid{grid-template-columns:1fr;} }
+  .result-card{
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px;
+    background:var(--paper-raised);
+  }
+  .result-card.disabled{opacity:.45;}
+  .result-card h3{
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    margin:0 0 8px;
+    color:var(--ink-soft);
+  }
+  .result-count{
+    font-family:var(--font-mono);
+    font-size:26px;
+    font-weight:700;
+    color:var(--accent-dark);
+    margin-bottom:10px;
+  }
+  .result-card input[type=text]{margin-top:8px; font-size:13px;}
+
+  .status-line{
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-top:10px;
+  }
+  .status-line.ok{color:var(--accent-dark);}
+  .status-line.err{color:var(--danger);}
+
+  select{
+    font-family:var(--font-body);
+    font-size:14px;
+    padding:9px 11px;
+    border-radius:6px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+  }
+
+  .btn-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;}
+
+  footer.site{
+    max-width:960px;
+    margin:0 auto;
+    padding:30px 24px 60px;
+    color:var(--ink-soft);
+    font-size:12.5px;
+    font-family:var(--font-mono);
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="eyebrow">Internal Tool &middot; Editorial Team</div>
+  <h1 class="title">CFP List Preparation From Scilit</h1>
+  <p class="subtitle">Upload a purged Scilit export, filter by zone/country, clean up affiliations and email domains, layer in keyword matches, and export a ready-to-use invitation list &mdash; all in your browser. Nothing is uploaded to a server.</p>
+</header>
+
+<div class="ledger">
+  <div class="ledger-inner" id="ledger">
+    <div class="ledger-item"><span class="ledger-label">Raw rows</span><span class="ledger-count" id="ledgerRaw">&mdash;</span></div>
+    <div class="ledger-item"><span class="ledger-label">Unique emails</span><span class="ledger-count" id="ledgerDedup">&mdash;</span></div>
+    <div class="ledger-item"><span class="ledger-label">Base filtered</span><span class="ledger-count" id="ledgerBase">&mdash;</span></div>
+    <div class="ledger-item"><span class="ledger-label">Affiliation match</span><span class="ledger-count" id="ledgerAff">&mdash;</span></div>
+    <div class="ledger-item"><span class="ledger-label">+ Reference match</span><span class="ledger-count" id="ledgerRef">&mdash;</span></div>
+  </div>
+</div>
+
+<main>
+
+  <!-- STEP 1 -->
+  <section class="step" id="step1">
+    <div class="step-head"><span class="step-num">1</span><h2 class="step-title">Upload the Scilit export</h2></div>
+    <p class="step-desc">Upload the purged Excel export from Scilit. The tool keeps only <strong>Name, EMail, Reference, Affiliation, Country/Region</strong>, drops rows with a blank email, and removes duplicate emails (first occurrence kept).</p>
+    <div class="card">
+      <div class="dropzone" id="dropzone">
+        <div class="icon">&#8595;</div>
+        <p><strong>Click to choose a file</strong> or drag an .xlsx / .xls here</p>
+        <p>Only Name, EMail, Reference, Affiliation, Country/Region are extracted</p>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none;">
+      </div>
+      <div class="file-status" id="fileStatus"></div>
+      <div class="col-preview" id="colPreview"></div>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="step" id="step2">
+    <div class="step-head"><span class="step-num">2</span><h2 class="step-title">Select countries by zone</h2></div>
+    <p class="step-desc">Click a zone header to select every country in that zone; uncheck any individual country you don't want. Countries not in any list below can be included via "Other / unlisted countries" and are treated as Zone 3. Your selection here also determines which country email domains are trusted in Step 4.</p>
+    <div class="card" id="zonesCard"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="step" id="step3">
+    <div class="step-head"><span class="step-num">3</span><h2 class="step-title">Remove unrelated affiliations</h2></div>
+    <p class="step-desc">Rows whose Affiliation contains any of these words are dropped, to avoid inviting people whose affiliation doesn't relate to clinical / personalized medicine (e.g. companies, veterinary or agricultural institutes). Add or remove words as needed.</p>
+    <div class="card">
+      <div class="chip-input-row">
+        <input type="text" id="excludeInput" placeholder="Type a word to exclude, then press Enter (e.g. veterinary)">
+        <button class="secondary" id="excludeAddBtn">Add</button>
+      </div>
+      <div class="chips" id="excludeChips"></div>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="step" id="step4">
+    <div class="step-head"><span class="step-num">4</span><h2 class="step-title">Email domain check</h2></div>
+    <p class="step-desc">An email is kept if its domain ends in one of the trusted country domains selected in Step 2, or in one of the checked domains below. This catches emails that don't reveal their country from the domain itself.</p>
+    <div class="card">
+      <label class="check"><input type="checkbox" id="excludeStudent" checked> Exclude any email address containing "student"</label>
+      <hr style="border:none;border-top:1px solid var(--line); margin:16px 0;">
+      <strong style="font-size:13px;">Major public email providers</strong>
+      <div class="domain-grid" id="bigDomainGrid" style="margin-top:8px;"></div>
+      <strong style="font-size:13px; display:block; margin-top:16px;">Generic / regional suffixes</strong>
+      <div class="domain-grid" id="genericDomainGrid" style="margin-top:8px;"></div>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="step" id="step5">
+    <div class="step-head"><span class="step-num">5</span><h2 class="step-title">Keyword match &mdash; Affiliation &amp; Reference</h2></div>
+    <p class="step-desc">Type a keyword and press Enter to add it (partial matches count, e.g. "endocrin" matches "Endocrinology"). Both fields are optional and can be skipped entirely.</p>
+    <div class="card">
+      <strong style="font-size:13px;">Affiliation keywords (optional)</strong>
+      <div class="chip-input-row" style="margin-top:8px;">
+        <input type="text" id="affInput" placeholder="e.g. genetics &ndash; press Enter to add">
+        <button class="secondary" id="affAddBtn">Add</button>
+      </div>
+      <div class="chips" id="affChips"><span class="chips-empty">No affiliation keywords added &mdash; this filter will be skipped.</span></div>
+    </div>
+    <div class="card">
+      <strong style="font-size:13px;">Reference keywords (optional)</strong>
+      <div class="chip-input-row" style="margin-top:8px;">
+        <input type="text" id="refInput" placeholder="e.g. biomarker &ndash; press Enter to add">
+        <button class="secondary" id="refAddBtn">Add</button>
+      </div>
+      <div class="chips" id="refChips"><span class="chips-empty">No reference keywords added &mdash; this filter will be skipped.</span></div>
+    </div>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="step" id="step6">
+    <div class="step-head"><span class="step-num">6</span><h2 class="step-title">Run &amp; download</h2></div>
+    <p class="step-desc">Run the filters to see live counts for all three possible outputs, then check the ones you want, name the files, and download.</p>
+    <div class="card">
+      <div class="btn-row">
+        <button id="runBtn">Run filtering</button>
+        <span class="status-line" id="runStatus"></span>
+      </div>
+    </div>
+    <div class="results-grid" id="resultsGrid">
+      <div class="result-card disabled" id="resultBase">
+        <h3>Unfiltered (base)</h3>
+        <div class="result-count" id="countBase">&mdash;</div>
+        <label class="check"><input type="checkbox" id="wantBase"> Include in download</label>
+        <input type="text" id="nameBase" placeholder="file name (no extension)">
+      </div>
+      <div class="result-card disabled" id="resultAff">
+        <h3>Affiliation-filtered</h3>
+        <div class="result-count" id="countAff">&mdash;</div>
+        <label class="check"><input type="checkbox" id="wantAff"> Include in download</label>
+        <input type="text" id="nameAff" placeholder="file name (no extension)">
+      </div>
+      <div class="result-card disabled" id="resultBoth">
+        <h3>Affiliation + Reference</h3>
+        <div class="result-count" id="countBoth">&mdash;</div>
+        <label class="check"><input type="checkbox" id="wantBoth"> Include in download</label>
+        <input type="text" id="nameBoth" placeholder="file name (no extension)">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button id="downloadBtn" disabled>Download selected files</button>
+      <span class="status-line" id="downloadStatus"></span>
+    </div>
+  </section>
+
+  <!-- STEP 7 -->
+  <section class="step" id="step7">
+    <div class="step-head"><span class="step-num optional">7</span><h2 class="step-title">Optional &mdash; journal alignment score</h2></div>
+    <p class="step-desc">Estimate how well each scholar's affiliation and reference text align with the scope of Journal of Personalized Medicine, Medicina, and Journal of Clinical Medicine (MDPI). This is a keyword-based heuristic, not a guarantee of fit &mdash; use it to prioritize outreach, not as a final decision.</p>
+    <div class="card">
+      <label style="font-size:13px; font-weight:600;">Source dataset</label><br>
+      <select id="scoreSource" style="margin-top:8px;">
+        <option value="base">Unfiltered (base)</option>
+        <option value="aff">Affiliation-filtered</option>
+        <option value="both">Affiliation + Reference filtered</option>
+      </select>
+      <div class="btn-row">
+        <button id="scoreRunBtn" disabled>Run alignment analysis</button>
+        <span class="status-line" id="scoreStatus"></span>
+      </div>
+      <div id="scoreResultBlock" style="display:none; margin-top:14px;">
+        <div class="result-count" id="scoreCount">&mdash;</div>
+        <input type="text" id="scoreFileName" placeholder="file name (no extension)" style="max-width:320px;">
+        <div class="btn-row">
+          <button id="scoreDownloadBtn">Download scored file</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site">
+  Runs entirely client-side in your browser &mdash; no file is uploaded anywhere. Re-open this HTML file any time to run it again.
+</footer>
+
+<script>
+/* ============================================================
+   DATA: zones, aliases, domains, default exclude keywords
+   ============================================================ */
+
+const ZONE1 = ["Australia","Austria","Belgium","Bulgaria","Canada","China","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Germany","Greece","Hong Kong","Hungary","Iceland","Ireland","Israel","Italy","Japan","Latvia","Liechtenstein","Lithuania","Luxembourg","Macao","Malta","Netherlands","New Zealand","Norway","Poland","Portugal","Singapore","Slovakia","Slovenia","South Korea","Spain","Sweden","Switzerland","Taiwan","United Kingdom","United States"];
+
+const ZONE2 = ["Algeria","Argentina","Bahrain","Belarus","Bosnia and Herzegovina","Brazil","Chile","Colombia","Costa Rica","Cuba","Ecuador","Egypt","French Guiana","Georgia","Guyana","Malaysia","Mexico","Morocco","North Macedonia","Northern Mariana Islands","Oman","Peru","Qatar","Saudi Arabia","Serbia","South Africa","Thailand","Turkey","Ukraine","United Arab Emirates","Uruguay","Vietnam"];
+
+const ZONE3 = ["Afghanistan","Andorra","Angola","Antigua and Barbuda","Armenia","Aruba","Azerbaijan","Bahamas","Bangladesh","Barbados","Belize","Benin","Bhutan","Bolivia","Botswana","Brunei Darussalam","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Central African Republic","Chad","Comoros","Congo","Côte d’Ivoire","Democratic Republic Congo","Djibouti","Dominica","Dominican Republic","El Salvador","Equatorial Guinea","Eritrea","Eswatini","Ethiopia","Faroe Islands","Fiji","French Polynesia","Gabon","Gambia","Ghana","Greenland","Grenada","Guatemala","Guinea","Guinea-Bissau","Haïti","Honduras","India","Indonesia","Iran","Iraq","Jamaica","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyz Republic","Laos","Lebanon","Lesotho","Liberia","Libya","Madagascar","Malawi","Maldives","Mali","Marshall Islands","Mauritania","Mauritius","Micronesia","Moldova","Mongolia","Montenegro","Mozambique","Myanmar","Namibia","Nauru","Nepal","Nicaragua","Niger","Nigeria","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Philippines","Puerto Rico","Republic of South Sudan","Russian Federation","Rwanda","Samoa","San Marino","Sao Tome and Principe","Senegal","Seychelles","Sierra Leone","Solomon Islands","Somalia","South Sudan","Sri Lanka","St. Kitts and Nevis","St. Lucia","St. Vincent and the Grenadines","Sudan","Suriname","Syrian Arab Republic","Tajikistan","Tanzania","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkmenistan","Tuvalu","Uganda","Uzbekistan","Vanuatu","Venezuela","West Bank and Gaza","Yemen","Zambia","Zimbabwe"];
+
+// country name (lowercase) -> ccTLD (used to trust an email domain for that country)
+const COUNTRY_TLD = {
+  "australia":"au","austria":"at","belgium":"be","bulgaria":"bg","canada":"ca","china":"cn","croatia":"hr","cyprus":"cy","czech republic":"cz","denmark":"dk","estonia":"ee","finland":"fi","france":"fr","germany":"de","greece":"gr","hong kong":"hk","hungary":"hu","iceland":"is","ireland":"ie","israel":"il","italy":"it","japan":"jp","latvia":"lv","liechtenstein":"li","lithuania":"lt","luxembourg":"lu","macao":"mo","malta":"mt","netherlands":"nl","new zealand":"nz","norway":"no","poland":"pl","portugal":"pt","singapore":"sg","slovakia":"sk","slovenia":"si","south korea":"kr","spain":"es","sweden":"se","switzerland":"ch","taiwan":"tw","united kingdom":"uk","united states":"us",
+  "algeria":"dz","argentina":"ar","bahrain":"bh","belarus":"by","bosnia and herzegovina":"ba","brazil":"br","chile":"cl","colombia":"co","costa rica":"cr","cuba":"cu","ecuador":"ec","egypt":"eg","french guiana":"gf","georgia":"ge","guyana":"gy","malaysia":"my","mexico":"mx","morocco":"ma","north macedonia":"mk","northern mariana islands":"mp","oman":"om","peru":"pe","qatar":"qa","saudi arabia":"sa","serbia":"rs","south africa":"za","thailand":"th","turkey":"tr","ukraine":"ua","united arab emirates":"ae","uruguay":"uy","vietnam":"vn",
+  "afghanistan":"af","andorra":"ad","angola":"ao","antigua and barbuda":"ag","armenia":"am","aruba":"aw","azerbaijan":"az","bahamas":"bs","bangladesh":"bd","barbados":"bb","belize":"bz","benin":"bj","bhutan":"bt","bolivia":"bo","botswana":"bw","brunei darussalam":"bn","burkina faso":"bf","burundi":"bi","cabo verde":"cv","cambodia":"kh","cameroon":"cm","central african republic":"cf","chad":"td","comoros":"km","congo":"cg","côte d’ivoire":"ci","democratic republic congo":"cd","djibouti":"dj","dominica":"dm","dominican republic":"do","el salvador":"sv","equatorial guinea":"gq","eritrea":"er","eswatini":"sz","ethiopia":"et","faroe islands":"fo","fiji":"fj","french polynesia":"pf","gabon":"ga","gambia":"gm","ghana":"gh","greenland":"gl","grenada":"gd","guatemala":"gt","guinea":"gn","guinea-bissau":"gw","haïti":"ht","honduras":"hn","india":"in","indonesia":"id","iran":"ir","iraq":"iq","jamaica":"jm","jordan":"jo","kazakhstan":"kz","kenya":"ke","kiribati":"ki","kosovo":"xk","kuwait":"kw","kyrgyz republic":"kg","laos":"la","lebanon":"lb","lesotho":"ls","liberia":"lr","libya":"ly","madagascar":"mg","malawi":"mw","maldives":"mv","mali":"ml","marshall islands":"mh","mauritania":"mr","mauritius":"mu","micronesia":"fm","moldova":"md","mongolia":"mn","montenegro":"me","mozambique":"mz","myanmar":"mm","namibia":"na","nauru":"nr","nepal":"np","nicaragua":"ni","niger":"ne","nigeria":"ng","pakistan":"pk","palau":"pw","palestine":"ps","panama":"pa","papua new guinea":"pg","paraguay":"py","philippines":"ph","puerto rico":"pr","republic of south sudan":"ss","russian federation":"ru","rwanda":"rw","samoa":"ws","san marino":"sm","sao tome and principe":"st","senegal":"sn","seychelles":"sc","sierra leone":"sl","solomon islands":"sb","somalia":"so","south sudan":"ss","sri lanka":"lk","st. kitts and nevis":"kn","st. lucia":"lc","st. vincent and the grenadines":"vc","sudan":"sd","suriname":"sr","syrian arab republic":"sy","tajikistan":"tj","tanzania":"tz","timor-leste":"tl","togo":"tg","tonga":"to","trinidad and tobago":"tt","tunisia":"tn","turkmenistan":"tm","tuvalu":"tv","uganda":"ug","uzbekistan":"uz","vanuatu":"vu","venezuela":"ve","west bank and gaza":"ps","yemen":"ye","zambia":"zm","zimbabwe":"zw"
+};
+
+// alias -> canonical name used above (handles common variants seen in Scilit exports)
+const COUNTRY_ALIASES = {
+  "usa":"united states","us":"united states","u.s.a.":"united states","u.s.":"united states",
+  "uk":"united kingdom","u.k.":"united kingdom","england":"united kingdom","scotland":"united kingdom","wales":"united kingdom","northern ireland":"united kingdom",
+  "the netherlands":"netherlands","holland":"netherlands",
+  "korea":"south korea","republic of korea":"south korea","korea, republic of":"south korea","south-korea":"south korea",
+  "russia":"russian federation",
+  "iran":"iran","islamic republic of iran":"iran",
+  "macedonia":"north macedonia",
+  "ivory coast":"côte d’ivoire","cote d'ivoire":"côte d’ivoire","côte d'ivoire":"côte d’ivoire",
+  "dr congo":"democratic republic congo","congo, dr":"democratic republic congo","dr. congo":"democratic republic congo","democratic republic of congo":"democratic republic congo","democratic republic of the congo":"democratic republic congo",
+  "the bahamas":"bahamas","the gambia":"gambia",
+  "syria":"syrian arab republic","laos, people's democratic republic":"laos",
+  "vatican city":"san marino"
+};
+
+const BIG_DOMAINS = ["gmail.com","outlook.com","yahoo.com","icloud.com","hotmail.com","naver.com","windowslive.com","hanmail.com","googlemail.com","samsung.com","live.com","aol.com","msn.com","mail.com","me.com","mac.com"];
+const GENERIC_DOMAINS = ["edu","org","net","eu"];
+
+const DEFAULT_EXCLUDE_KEYWORDS = ["inc","ltd","animal","veterinary","agricult","forensic","chemistry","mechanical","electrical","food","foods","natural"];
+
+const JOURNAL_KEYWORDS = ["personalized medicine","precision medicine","pharmacogenomics","pharmacogenetics","biomarker","genomic","genetic polymorphism","genome-wide association","molecular diagnostics","clinical trial","therapeutic","oncology","cardiology","endocrinology","immunology","neurology","pediatrics","psychiatry","radiology","pathology","surgery","internal medicine","infectious disease","public health","epidemiology","clinical medicine","disease management","risk prediction","prognosis","diagnosis","treatment outcome","drug therapy","clinical pharmacology","translational medicine","genomic medicine","artificial intelligence in medicine","machine learning","telemedicine","patient care","clinical research","evidence-based medicine","health outcomes","perfusion","biomarkers of disease"];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  rawCount:0,
+  rows:[],            // after column selection + dedup + blank-email removal
+  baseRows:null,       // after zone/country + affiliation-exclude + email-domain
+  affRows:null,
+  bothRows:null,
+  excludeKeywords:[...DEFAULT_EXCLUDE_KEYWORDS],
+  affKeywords:[],
+  refKeywords:[]
+};
+
+/* ============================================================
+   UTIL
+   ============================================================ */
+function normalizeHeader(h){ return String(h).toLowerCase().replace(/[^a-z0-9]/g,''); }
+function findColumnKey(row, target){
+  const t = normalizeHeader(target);
+  const keys = Object.keys(row);
+  for(const k of keys){ if(normalizeHeader(k)===t) return k; }
+  return null;
+}
+function fmt(n){ return n.toLocaleString(); }
+
+function normalizeCountry(raw){
+  let c = String(raw||"").trim().toLowerCase();
+  if(COUNTRY_ALIASES[c]) c = COUNTRY_ALIASES[c];
+  return c;
+}
+function zoneOfCountry(cLower){
+  if(ZONE1.some(x=>x.toLowerCase()===cLower)) return 1;
+  if(ZONE2.some(x=>x.toLowerCase()===cLower)) return 2;
+  if(ZONE3.some(x=>x.toLowerCase()===cLower)) return 3;
+  return 0; // unknown/unlisted
+}
+
+/* ============================================================
+   STEP 1 — UPLOAD
+   ============================================================ */
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const fileStatus = document.getElementById('fileStatus');
+const colPreview = document.getElementById('colPreview');
+
+dropzone.addEventListener('click', ()=>fileInput.click());
+dropzone.addEventListener('dragover', e=>{e.preventDefault(); dropzone.classList.add('drag');});
+dropzone.addEventListener('dragleave', ()=>dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', e=>{
+  e.preventDefault(); dropzone.classList.remove('drag');
+  if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e=>{
+  if(e.target.files.length) handleFile(e.target.files[0]);
+});
+
+function handleFile(file){
+  fileStatus.textContent = "Reading " + file.name + " ...";
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, {type:'array'});
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(sheet, {defval:''});
+      if(!json.length){ fileStatus.textContent = "The file appears to be empty."; return; }
+      processRows(json, file.name);
+    }catch(err){
+      console.error(err);
+      fileStatus.textContent = "Could not read this file: " + err.message;
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function processRows(json, fname){
+  const first = json[0];
+  const nameKey = findColumnKey(first,'Name');
+  const emailKey = findColumnKey(first,'EMail') || findColumnKey(first,'Email');
+  const refKey = findColumnKey(first,'Reference');
+  const affKey = findColumnKey(first,'Affiliation');
+  const countryKey = findColumnKey(first,'Country/Region') || findColumnKey(first,'Country');
+
+  if(!emailKey){
+    fileStatus.textContent = "Couldn't find an 'EMail' column in this file. Found columns: " + Object.keys(first).join(', ');
+    return;
+  }
+
+  state.rawCount = json.length;
+
+  const mapped = json.map(r=>({
+    Name: nameKey ? r[nameKey] : '',
+    EMail: emailKey ? String(r[emailKey]||'').trim() : '',
+    Reference: refKey ? r[refKey] : '',
+    Affiliation: affKey ? r[affKey] : '',
+    Country: countryKey ? r[countryKey] : ''
+  }));
+
+  const withEmail = mapped.filter(r=>r.EMail && r.EMail.length>0);
+  const seen = new Set();
+  const deduped = [];
+  for(const r of withEmail){
+    const key = r.EMail.toLowerCase();
+    if(!seen.has(key)){ seen.add(key); deduped.push(r); }
+  }
+
+  state.rows = deduped;
+
+  fileStatus.textContent = "Loaded " + fname + " — " + fmt(state.rawCount) + " rows read, " + fmt(deduped.length) + " unique rows with an email kept.";
+  fileStatus.className = "file-status";
+
+  // preview
+  let html = "<table><thead><tr><th>Name</th><th>EMail</th><th>Reference</th><th>Affiliation</th><th>Country/Region</th></tr></thead><tbody>";
+  deduped.slice(0,5).forEach(r=>{
+    html += "<tr><td>"+esc(r.Name)+"</td><td>"+esc(r.EMail)+"</td><td>"+esc(r.Reference)+"</td><td>"+esc(r.Affiliation)+"</td><td>"+esc(r.Country)+"</td></tr>";
+  });
+  html += "</tbody></table><div style='margin-top:6px;color:var(--ink-soft);font-size:12px;'>Showing first 5 of "+fmt(deduped.length)+" rows.</div>";
+  colPreview.innerHTML = html;
+
+  updateLedger();
+  resetDownstream();
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function resetDownstream(){
+  state.baseRows = state.affRows = state.bothRows = null;
+  document.getElementById('countBase').textContent = '—';
+  document.getElementById('countAff').textContent = '—';
+  document.getElementById('countBoth').textContent = '—';
+  ['resultBase','resultAff','resultBoth'].forEach(id=>document.getElementById(id).classList.add('disabled'));
+  document.getElementById('downloadBtn').disabled = true;
+  document.getElementById('scoreRunBtn').disabled = true;
+  updateLedger();
+}
+
+/* ============================================================
+   STEP 2 — ZONES
+   ============================================================ */
+const zonesCard = document.getElementById('zonesCard');
+const countryChecks = {}; // countryLower -> checkbox element
+
+function buildZones(){
+  let html = '';
+  html += zoneBlockHtml('Zone 1', 'z1', ZONE1);
+  html += zoneBlockHtml('Zone 2', 'z2', ZONE2);
+  html += zoneBlockHtml('Zone 3', 'z3', ZONE3);
+  html += `
+  <div class="zone-block">
+    <div class="zone-header z3">
+      <span class="zone-name">Other / unlisted countries</span>
+    </div>
+    <label class="check"><input type="checkbox" id="includeUnlisted"> Include countries not listed above (treated as Zone 3; trusted only via the domains checked in Step 4, since their country TLD is unknown)</label>
+  </div>`;
+  zonesCard.innerHTML = html;
+
+  [['Zone 1','z1',ZONE1],['Zone 2','z2',ZONE2],['Zone 3','z3',ZONE3]].forEach(([label,cls,list])=>{
+    list.forEach(country=>{
+      const id = 'ctry_'+cls+'_'+country.replace(/[^a-z0-9]/gi,'');
+      countryChecks[country.toLowerCase()] = document.getElementById(id);
+    });
+  });
+
+  document.querySelectorAll('.zone-select-all').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const cls = btn.dataset.zone;
+      const list = cls==='z1'?ZONE1:cls==='z2'?ZONE2:ZONE3;
+      list.forEach(c=>{ countryChecks[c.toLowerCase()].checked = true; });
+    });
+  });
+  document.querySelectorAll('.zone-clear-all').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const cls = btn.dataset.zone;
+      const list = cls==='z1'?ZONE1:cls==='z2'?ZONE2:ZONE3;
+      list.forEach(c=>{ countryChecks[c.toLowerCase()].checked = false; });
+    });
+  });
+}
+
+function zoneBlockHtml(label, cls, list){
+  let inner = list.map(c=>{
+    const id = 'ctry_'+cls+'_'+c.replace(/[^a-z0-9]/gi,'');
+    return `<label class="check"><input type="checkbox" id="${id}"> ${esc(c)}</label>`;
+  }).join('');
+  return `
+  <div class="zone-block">
+    <div class="zone-header ${cls}">
+      <span class="zone-name">${label} <span style="font-weight:400; opacity:.7;">(${list.length} countries)</span></span>
+      <span class="zone-actions">
+        <button class="secondary small zone-select-all" data-zone="${cls}" type="button">Select all</button>
+        <button class="secondary small zone-clear-all" data-zone="${cls}" type="button">Clear</button>
+      </span>
+    </div>
+    <div class="country-grid">${inner}</div>
+  </div>`;
+}
+buildZones();
+
+/* ============================================================
+   STEP 3 — EXCLUDE KEYWORDS (chips)
+   ============================================================ */
+function chipUI(inputId, addBtnId, chipsId, arrRef, onChange, placeholderEmpty){
+  const input = document.getElementById(inputId);
+  const addBtn = document.getElementById(addBtnId);
+  const chipsEl = document.getElementById(chipsId);
+
+  function render(){
+    if(arrRef.length===0){
+      chipsEl.innerHTML = `<span class="chips-empty">${placeholderEmpty}</span>`;
+      return;
+    }
+    chipsEl.innerHTML = arrRef.map((k,i)=>`<span class="chip">${esc(k)}<button type="button" data-i="${i}">×</button></span>`).join('');
+    chipsEl.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        arrRef.splice(parseInt(btn.dataset.i),1);
+        render();
+        if(onChange) onChange();
+      });
+    });
+  }
+  function add(){
+    const v = input.value.trim();
+    if(v && !arrRef.some(k=>k.toLowerCase()===v.toLowerCase())){
+      arrRef.push(v);
+      render();
+      if(onChange) onChange();
+    }
+    input.value='';
+  }
+  addBtn.addEventListener('click', add);
+  input.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); add(); }
+  });
+  render();
+}
+
+chipUI('excludeInput','excludeAddBtn','excludeChips', state.excludeKeywords, resetDownstream, 'No exclude words — nothing will be removed at this step.');
+chipUI('affInput','affAddBtn','affChips', state.affKeywords, resetDownstream, 'No affiliation keywords added — this filter will be skipped.');
+chipUI('refInput','refAddBtn','refChips', state.refKeywords, resetDownstream, 'No reference keywords added — this filter will be skipped.');
+
+/* ============================================================
+   STEP 4 — DOMAIN CHECKBOXES
+   ============================================================ */
+const bigDomainGrid = document.getElementById('bigDomainGrid');
+const genericDomainGrid = document.getElementById('genericDomainGrid');
+const bigDomainChecks = {};
+const genericDomainChecks = {};
+
+bigDomainGrid.innerHTML = BIG_DOMAINS.map(d=>{
+  const id = 'big_'+d.replace(/[^a-z0-9]/gi,'');
+  return `<label class="check"><input type="checkbox" id="${id}" checked> ${d}</label>`;
+}).join('');
+BIG_DOMAINS.forEach(d=>{ bigDomainChecks[d] = document.getElementById('big_'+d.replace(/[^a-z0-9]/gi,'')); });
+
+genericDomainGrid.innerHTML = GENERIC_DOMAINS.map(d=>{
+  const id = 'gen_'+d;
+  return `<label class="check"><input type="checkbox" id="${id}" checked> .${d}</label>`;
+}).join('');
+GENERIC_DOMAINS.forEach(d=>{ genericDomainChecks[d] = document.getElementById('gen_'+d); });
+
+/* ============================================================
+   FILTER LOGIC
+   ============================================================ */
+function selectedCountriesLower(){
+  const set = new Set();
+  Object.keys(countryChecks).forEach(cLower=>{
+    if(countryChecks[cLower] && countryChecks[cLower].checked) set.add(cLower);
+  });
+  return set;
+}
+function trustedTlds(selectedSet, includeUnlisted){
+  const tlds = new Set();
+  selectedSet.forEach(cLower=>{
+    if(COUNTRY_TLD[cLower]) tlds.add(COUNTRY_TLD[cLower]);
+  });
+  return tlds;
+}
+function allowedBigDomains(){
+  return BIG_DOMAINS.filter(d=>bigDomainChecks[d] && bigDomainChecks[d].checked);
+}
+function allowedGenericSuffixes(){
+  return GENERIC_DOMAINS.filter(d=>genericDomainChecks[d] && genericDomainChecks[d].checked);
+}
+
+function emailDomainAllowed(email, tldSet, bigList, genericList){
+  const domain = email.split('@').pop().toLowerCase().trim();
+  if(!domain) return false;
+  for(const bd of bigList){ if(domain===bd || domain.endsWith('.'+bd)) return true; }
+  for(const g of genericList){ if(domain.endsWith('.'+g)) return true; }
+  for(const t of tldSet){ if(domain.endsWith('.'+t)) return true; }
+  return false;
+}
+
+function matchesKeywords(text, keywords){
+  if(!keywords.length) return true;
+  const t = String(text||'').toLowerCase();
+  return keywords.some(k=>t.includes(k.toLowerCase()));
+}
+
+function runFiltering(){
+  if(!state.rows.length){
+    document.getElementById('runStatus').textContent = 'Please upload a file first (Step 1).';
+    document.getElementById('runStatus').className = 'status-line err';
+    return;
+  }
+  const selCountries = selectedCountriesLower();
+  const includeUnlisted = document.getElementById('includeUnlisted').checked;
+  const tldSet = trustedTlds(selCountries);
+  const bigList = allowedBigDomains();
+  const genericList = allowedGenericSuffixes();
+  const excludeStudent = document.getElementById('excludeStudent').checked;
+
+  // Step 2: country/zone filter
+  let step2 = state.rows.filter(r=>{
+    const cLower = normalizeCountry(r.Country);
+    if(selCountries.has(cLower)) return true;
+    if(includeUnlisted){
+      const z = zoneOfCountry(cLower);
+      if(z===0) return true; // unlisted, and unlisted toggle is on
+    }
+    return false;
+  });
+
+  // Step 3: affiliation exclude
+  let step3 = step2.filter(r=>{
+    if(!state.excludeKeywords.length) return true;
+    const aff = String(r.Affiliation||'').toLowerCase();
+    return !state.excludeKeywords.some(k=>aff.includes(k.toLowerCase()));
+  });
+
+  // Step 4: email domain + student exclusion
+  let step4 = step3.filter(r=>{
+    if(excludeStudent && r.EMail.toLowerCase().includes('student')) return false;
+    return emailDomainAllowed(r.EMail, tldSet, bigList, genericList);
+  });
+
+  state.baseRows = step4;
+
+  // Step 5: affiliation keywords
+  state.affRows = state.affKeywords.length
+    ? state.baseRows.filter(r=>matchesKeywords(r.Affiliation, state.affKeywords))
+    : state.baseRows.slice();
+
+  // Step 5b: + reference keywords (built on affiliation-filtered set)
+  state.bothRows = state.refKeywords.length
+    ? state.affRows.filter(r=>matchesKeywords(r.Reference, state.refKeywords))
+    : state.affRows.slice();
+
+  document.getElementById('countBase').textContent = fmt(state.baseRows.length);
+  document.getElementById('countAff').textContent = fmt(state.affRows.length) + (state.affKeywords.length?'':' (no keywords set)');
+  document.getElementById('countBoth').textContent = fmt(state.bothRows.length) + (state.refKeywords.length?'':' (no ref. keywords set)');
+
+  document.getElementById('resultBase').classList.remove('disabled');
+  document.getElementById('resultAff').classList.toggle('disabled', state.affKeywords.length===0);
+  document.getElementById('resultBoth').classList.toggle('disabled', state.refKeywords.length===0);
+
+  document.getElementById('runStatus').textContent = 'Done — counts updated below.';
+  document.getElementById('runStatus').className = 'status-line ok';
+
+  document.getElementById('downloadBtn').disabled = false;
+  document.getElementById('scoreRunBtn').disabled = false;
+
+  updateLedger();
+}
+document.getElementById('runBtn').addEventListener('click', runFiltering);
+
+function updateLedger(){
+  document.getElementById('ledgerRaw').textContent = state.rawCount ? fmt(state.rawCount) : '—';
+  document.getElementById('ledgerDedup').textContent = state.rows.length ? fmt(state.rows.length) : '—';
+  document.getElementById('ledgerBase').textContent = state.baseRows ? fmt(state.baseRows.length) : '—';
+  document.getElementById('ledgerAff').textContent = state.affRows ? fmt(state.affRows.length) : '—';
+  document.getElementById('ledgerRef').textContent = state.bothRows ? fmt(state.bothRows.length) : '—';
+}
+
+/* ============================================================
+   DOWNLOAD (Step 6)
+   ============================================================ */
+function rowsToWorkbookAndDownload(rows, filenameRaw){
+  let filename = (filenameRaw||'output').trim();
+  if(!filename.endsWith('.xlsx')) filename += '.xlsx';
+  const clean = rows.map(r=>({
+    Name: r.Name, EMail: r.EMail, Reference: r.Reference, Affiliation: r.Affiliation, "Country/Region": r.Country,
+    ...(r._MatchedKeyword!==undefined ? {"Best Matched Keyword": r._MatchedKeyword, "Alignment %": r._MatchPercent} : {})
+  }));
+  const ws = XLSX.utils.json_to_sheet(clean);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Filtered');
+  XLSX.writeFile(wb, filename);
+}
+
+document.getElementById('downloadBtn').addEventListener('click', ()=>{
+  const jobs = [];
+  if(document.getElementById('wantBase').checked && state.baseRows) jobs.push([state.baseRows, document.getElementById('nameBase').value || 'unfiltered_base']);
+  if(document.getElementById('wantAff').checked && state.affRows && state.affKeywords.length) jobs.push([state.affRows, document.getElementById('nameAff').value || 'affiliation_filtered']);
+  if(document.getElementById('wantBoth').checked && state.bothRows && state.refKeywords.length) jobs.push([state.bothRows, document.getElementById('nameBoth').value || 'affiliation_reference_filtered']);
+
+  if(!jobs.length){
+    document.getElementById('downloadStatus').textContent = 'Check at least one output above (only outputs with keywords set can be downloaded for Affiliation / Affiliation+Reference).';
+    document.getElementById('downloadStatus').className = 'status-line err';
+    return;
+  }
+  jobs.forEach(([rows,name])=>rowsToWorkbookAndDownload(rows,name));
+  document.getElementById('downloadStatus').textContent = jobs.length + ' file(s) downloaded.';
+  document.getElementById('downloadStatus').className = 'status-line ok';
+});
+
+/* ============================================================
+   STEP 7 — JOURNAL ALIGNMENT SCORE (optional)
+   ============================================================ */
+document.getElementById('scoreRunBtn').addEventListener('click', ()=>{
+  const src = document.getElementById('scoreSource').value;
+  const rows = src==='base' ? state.baseRows : src==='aff' ? state.affRows : state.bothRows;
+  if(!rows || !rows.length){
+    document.getElementById('scoreStatus').textContent = 'That dataset is empty — run Step 6 first.';
+    document.getElementById('scoreStatus').className = 'status-line err';
+    return;
+  }
+  const scored = rows.map(r=>{
+    const text = (String(r.Affiliation||'') + ' ' + String(r.Reference||'')).toLowerCase();
+    const matched = JOURNAL_KEYWORDS.filter(k=>text.includes(k));
+    const pct = Math.round((matched.length / JOURNAL_KEYWORDS.length) * 1000) / 10;
+    return {...r, _MatchedKeyword: matched.length ? matched[0] : 'none', _MatchPercent: pct};
+  });
+  state.scoredRows = scored;
+  document.getElementById('scoreCount').textContent = fmt(scored.length) + ' rows scored';
+  document.getElementById('scoreResultBlock').style.display = 'block';
+  document.getElementById('scoreStatus').textContent = 'Done.';
+  document.getElementById('scoreStatus').className = 'status-line ok';
+});
+
+document.getElementById('scoreDownloadBtn').addEventListener('click', ()=>{
+  if(!state.scoredRows) return;
+  const name = document.getElementById('scoreFileName').value || 'journal_alignment_scored';
+  rowsToWorkbookAndDownload(state.scoredRows, name);
+});
+</script>
+</body>
+</html>
